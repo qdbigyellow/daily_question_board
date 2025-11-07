@@ -19,7 +19,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           # Call Google Gemini API
-          RESPONSE=$(curl -s -X POST \
+          RESPONSE=$(curl -s --max-time 180 -X POST \
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}" \
             -H 'Content-Type: application/json' \
             -d '{
@@ -32,7 +32,7 @@ jobs:
                 "temperature": 0.3
               }
             }')
-          
+
           # Extract text and save to JSON
           echo "$RESPONSE" | jq '{
             timestamp: now | strftime("%Y-%m-%d %H:%M:%S UTC"),
