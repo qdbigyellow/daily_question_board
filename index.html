@@ -5,59 +5,359 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily AI Insights</title>
+
+    <!-- Marked.js for markdown rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
             line-height: 1.6;
-            background: #f5f5f5;
         }
 
         .container {
+            max-width: 900px;
+            margin: 0 auto;
             background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
         }
 
-        .timestamp {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 20px;
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            color: white;
+            text-align: center;
         }
 
-        .content {
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header .subtitle {
             font-size: 1.1em;
-            white-space: pre-wrap;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .timestamp-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            backdrop-filter: blur(10px);
+        }
+
+        .content-wrapper {
+            padding: 50px;
         }
 
         .loading {
             text-align: center;
-            color: #666;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .loading::after {
+            content: '...';
+            display: inline-block;
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+
+            0%,
+            20% {
+                content: '.';
+            }
+
+            40% {
+                content: '..';
+            }
+
+            60%,
+            100% {
+                content: '...';
+            }
+        }
+
+        /* Markdown Styling */
+        .markdown-content {
+            color: #333;
+            font-size: 1.05em;
+        }
+
+        .markdown-content h1 {
+            font-size: 2em;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            color: #2d3748;
+        }
+
+        .markdown-content h2 {
+            font-size: 1.6em;
+            margin: 25px 0 15px 0;
+            color: #4a5568;
+            padding-left: 10px;
+            border-left: 4px solid #764ba2;
+        }
+
+        .markdown-content h3 {
+            font-size: 1.3em;
+            margin: 20px 0 12px 0;
+            color: #667eea;
+        }
+
+        .markdown-content p {
+            margin: 15px 0;
+            line-height: 1.8;
+            color: #4a5568;
+        }
+
+        .markdown-content ul,
+        .markdown-content ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        .markdown-content li {
+            margin: 8px 0;
+            line-height: 1.7;
+        }
+
+        .markdown-content blockquote {
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            margin: 20px 0;
+            background: #f7fafc;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #4a5568;
+        }
+
+        .markdown-content code {
+            background: #f7fafc;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #e53e3e;
+        }
+
+        .markdown-content pre {
+            background: #2d3748;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .markdown-content pre code {
+            background: transparent;
+            padding: 0;
+            color: #e2e8f0;
+            font-size: 0.95em;
+        }
+
+        .markdown-content a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .markdown-content a:hover {
+            border-bottom-color: #667eea;
+        }
+
+        .markdown-content strong {
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .markdown-content em {
+            color: #4a5568;
+        }
+
+        .markdown-content hr {
+            border: none;
+            border-top: 2px solid #e2e8f0;
+            margin: 30px 0;
+        }
+
+        .markdown-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .markdown-content th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .markdown-content td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .markdown-content tr:hover {
+            background: #f7fafc;
+        }
+
+        .markdown-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            background: #f7fafc;
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .content-wrapper {
+                padding: 30px 20px;
+            }
+
+            .markdown-content {
+                font-size: 1em;
+            }
+        }
+
+        /* Smooth fade-in animation */
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Error state */
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #e53e3e;
+        }
+
+        .error-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Daily AI Insight</h1>
-        <div class="timestamp" id="timestamp">Loading...</div>
-        <div class="content" id="content" class="loading">Loading today's insight...</div>
+        <div class="header">
+            <h1>✨ Daily AI Insights</h1>
+            <p class="subtitle">Your daily dose of wisdom and inspiration</p>
+            <div class="timestamp-badge" id="timestamp">Loading...</div>
+        </div>
+
+        <div class="content-wrapper">
+            <div id="content" class="loading">Loading today's insight</div>
+        </div>
+
+        <div class="footer">
+            Updates automatically every day • Powered by AI
+        </div>
     </div>
 
     <script>
+        // Configure marked for better rendering
+        marked.setOptions({
+            breaks: true,
+            gfm: true,
+            headerIds: true,
+            mangle: false,
+            sanitize: false
+        });
+
+        // Fetch and display content
         fetch('response.json')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load content');
+                }
+                return response.json();
+            })
             .then(data => {
-                document.getElementById('timestamp').textContent = `Updated: ${data.timestamp}`;
-                document.getElementById('content').textContent = data.response;
-                document.getElementById('content').classList.remove('loading');
+                // Update timestamp
+                const timestampEl = document.getElementById('timestamp');
+                timestampEl.textContent = `📅 Updated: ${data.timestamp}`;
+
+                // Parse markdown and render
+                const contentEl = document.getElementById('content');
+                const htmlContent = marked.parse(data.response);
+                contentEl.innerHTML = htmlContent;
+                contentEl.className = 'markdown-content fade-in';
+
+                // Highlight code blocks if any
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
             })
             .catch(error => {
-                document.getElementById('content').textContent = 'Error loading content';
                 console.error('Error:', error);
+                document.getElementById('content').innerHTML = `
+                    <div class="error">
+                        <div class="error-icon">⚠️</div>
+                        <h2>Unable to load content</h2>
+                        <p>Please check back later</p>
+                    </div>
+                `;
+                document.getElementById('timestamp').textContent = 'Update pending';
             });
     </script>
 </body>
