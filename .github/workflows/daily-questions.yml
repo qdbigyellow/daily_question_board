@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Call LLM and Update
+      - name: Call LLM and Update-1
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
@@ -25,7 +25,7 @@ jobs:
             -d '{
               "contents": [{
                 "parts": [{
-                  "text": "Create three multiple-choice questions (MCQs) with the following specifications: AWS Architect (Intermediate Level), A question that tests practical knowledge of AWS architecture, services, or best practices suitable for someone with mid-level experience;Terraform Script (Intermediate Level): A question focused on writing, understanding, or debugging Terraform scripts, aimed at someone with hands-on experience in infrastructure as code; Python Programming (Advanced Level): A question that assesses deep understanding of Python language features, algorithms, or design patterns, without relying on external libraries.For each question, provide:The question itself.  Four answer options (A, B, C, D), with only one correct answer. A brief explanation of why the correct answer is right and why the others are wrong."
+                  "text": ${{ var.PROMPT2}}
                 }]
               }]
             }')
@@ -38,9 +38,40 @@ jobs:
             response: .candidates[0].content.parts[0].text
           }' > response.json
           
-      - name: Commit and Push
+      - name: Commit and Push-1
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add response.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Daily update $(date +%Y-%m-%d)" && git push)
+      
+      - name: Call LLM and Update-2
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          # Call Google Gemini API
+          RESPONSE=$(curl -s --max-time 180 -X POST \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "contents": [{
+                "parts": [{
+                  "text": ${{ var.PROMPT2}}
+                }]
+              }]
+            }')
+
+          echo $RESPONSE
+
+          # Extract text and save to JSON
+          echo "$RESPONSE" | jq '{
+            timestamp: now | strftime("%Y-%m-%d %H:%M:%S UTC"),
+            response: .candidates[0].content.parts[0].text
+          }' > response-2.json
+          
+      - name: Commit and Push-2
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add response-2.json
           git diff --quiet && git diff --staged --quiet || (git commit -m "Daily update $(date +%Y-%m-%d)" && git push)
