@@ -1,0 +1,44 @@
+name: Daily LLM Update
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # Runs at 9 AM UTC daily
+  workflow_dispatch:      # Manual trigger option
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Call LLM and Update
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          # Call Google Gemini API
+          RESPONSE=$(curl -s -X POST \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "contents": [{
+                "parts": [{
+                  "text": "Your daily prompt goes here"
+                }]
+              }]
+            }')
+          
+          # Extract text and save to JSON
+          echo "$RESPONSE" | jq '{
+            timestamp: now | strftime("%Y-%m-%d %H:%M:%S UTC"),
+            response: .candidates[0].content.parts[0].text
+          }' > response.json
+          
+      - name: Commit and Push
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add response.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Daily update $(date +%Y-%m-%d)" && git push)

@@ -1,0 +1,16 @@
+# Ignore devcontainer and VS Code environment files
+.devcontainer/
+.vscode/
+*.code-workspace
+
+# VS Code remote/server caches
+.vscode-server/
+.vscode-remote/
+.vscode-test/
+
+# Workspace storage (local user state)
+.vscode/**/workspaceStorage/
+
+# Optional local history / settings editors might create
+.history/
+.settings/
