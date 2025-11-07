@@ -33,6 +33,8 @@ jobs:
               }
             }')
 
+          echo $RESPONSE
+
           # Extract text and save to JSON
           echo "$RESPONSE" | jq '{
             timestamp: now | strftime("%Y-%m-%d %H:%M:%S UTC"),
