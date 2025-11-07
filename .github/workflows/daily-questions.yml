@@ -20,14 +20,17 @@ jobs:
         run: |
           # Call Google Gemini API
           RESPONSE=$(curl -s -X POST \
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}" \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}" \
             -H 'Content-Type: application/json' \
             -d '{
               "contents": [{
                 "parts": [{
                   "text": "Create three multiple-choice questions (MCQs) with the following specifications: AWS Architect (Intermediate Level), A question that tests practical knowledge of AWS architecture, services, or best practices suitable for someone with mid-level experience;Terraform Script (Intermediate Level): A question focused on writing, understanding, or debugging Terraform scripts, aimed at someone with hands-on experience in infrastructure as code; Python Programming (Advanced Level): A question that assesses deep understanding of Python language features, algorithms, or design patterns, without relying on external libraries.For each question, provide:The question itself.  Four answer options (A, B, C, D), with only one correct answer. A brief explanation of why the correct answer is right and why the others are wrong."
                 }]
-              }]
+              }],
+              "config": {
+                "temperature": 0.3
+              }
             }')
           
           # Extract text and save to JSON
