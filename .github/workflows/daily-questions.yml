@@ -36,13 +36,13 @@ jobs:
           echo "$RESPONSE" | jq '{
             timestamp: now | strftime("%Y-%m-%d %H:%M:%S UTC"),
             response: .candidates[0].content.parts[0].text
-          }' > response.json
+          }' > ${{ vars.RESPONSE_FILE_TECH_Q }}
           
       - name: Commit and Push-1
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add response.json
+          git add ${{ vars.RESPONSE_FILE_TECH_Q }}
           git diff --quiet && git diff --staged --quiet || (git commit -m "Daily update $(date +%Y-%m-%d)" && git push --force)
       
       - name: Call LLM and Update-2
@@ -67,11 +67,11 @@ jobs:
           echo "$RESPONSE" | jq '{
             timestamp: now | strftime("%Y-%m-%d %H:%M:%S UTC"),
             response: .candidates[0].content.parts[0].text
-          }' > response-2.json
+          }' > ${{ vars.RESPONSE_FILE_KID1_Q }}
           
       - name: Commit and Push-2
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add response-1.json
+          git add ${{ vars.RESPONSE_FILE_KID1_Q }}
           git diff --quiet && git diff --staged --quiet || (git commit -m "Daily update $(date +%Y-%m-%d)" && git push --force)
