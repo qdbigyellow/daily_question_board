@@ -75,3 +75,34 @@ jobs:
           git config user.email "actions@github.com"
           git add ${{ vars.RESPONSE_FILE_KID1_Q }}
           git diff --quiet && git diff --staged --quiet || (git commit -m "Daily update $(date +%Y-%m-%d)" && git push --force)
+      
+      - name: Call LLM and Update-3
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          # Call Google Gemini API
+          RESPONSE=$(curl -s --max-time 180 -X POST \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "contents": [{
+                "parts": [{
+                  "text": "${{ vars.PROMPTKIDSGAME }}"
+                }]
+              }]
+            }')
+
+          echo $RESPONSE
+
+          # Extract text and save to JSON
+          echo "$RESPONSE" | jq '{
+            timestamp: now | strftime("%Y-%m-%d %H:%M:%S UTC"),
+            response: .candidates[0].content.parts[0].text
+          }' > ${{ vars.RESPONSE_FILE_KID_GAME_Q }}
+
+      - name: Commit and Push-3
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add ${{ vars.RESPONSE_FILE_KID_GAME_Q }}
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Daily update $(date +%Y-%m-%d)" && git push --force)
